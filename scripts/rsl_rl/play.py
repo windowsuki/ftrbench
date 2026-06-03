@@ -8,6 +8,7 @@
 """Launch Isaac Sim Simulator first."""
 
 import argparse
+import ast
 
 from isaaclab.app import AppLauncher
 
@@ -33,7 +34,7 @@ parser.add_argument("--real-time", action="store_true", default=False, help="Run
 cli_args.add_rsl_rl_args(parser)
 # append AppLauncher cli args
 AppLauncher.add_app_launcher_args(parser)
-args_cli = parser.parse_args()
+args_cli, env_override_args = parser.parse_known_args()
 # always enable cameras to record video
 if args_cli.video:
     args_cli.enable_cameras = True
@@ -64,12 +65,33 @@ from isaaclab_tasks.utils import get_checkpoint_path, parse_env_cfg
 import ftrbench.tasks  # noqa: F401
 
 
+def _parse_override_value(value: str):
+    try:
+        return ast.literal_eval(value)
+    except (SyntaxError, ValueError):
+        return value
+
+
+def _apply_env_overrides(env_cfg, overrides: list[str]) -> None:
+    for override in overrides:
+        if not override.startswith("env.") or "=" not in override:
+            parser.error(f"unrecognized argument: {override}")
+
+        key, value = override.split("=", 1)
+        target = env_cfg
+        attrs = key.removeprefix("env.").split(".")
+        for attr in attrs[:-1]:
+            target = getattr(target, attr)
+        setattr(target, attrs[-1], _parse_override_value(value))
+
+
 def main():
     """Play with RSL-RL agent."""
     # parse configuration
     env_cfg = parse_env_cfg(
         args_cli.task, device=args_cli.device, num_envs=args_cli.num_envs, use_fabric=not args_cli.disable_fabric
     )
+    _apply_env_overrides(env_cfg, env_override_args)
     agent_cfg: RslRlOnPolicyRunnerCfg = cli_args.parse_rsl_rl_cfg(args_cli.task, args_cli)
 
     # specify directory for logging experiments

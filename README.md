@@ -71,6 +71,7 @@ python scripts/rsl_rl/play.py --task Ftr-Flat-Direct-v0 --num_envs 1
 python scripts/rsl_rl/play.py --task Ftr-Rough-Direct-v0 --num_envs 1
 python scripts/rsl_rl/play.py --task Ftr-ReferenceRough-Direct-v0 --num_envs 1
 python scripts/rsl_rl/play.py --task Ftr-ReferenceTerrain-Direct-v0 --num_envs 1
+python scripts/rsl_rl/play.py --task Ftr-ReferenceTerrain-Direct-v0 --num_envs 1 env.reference_terrain_name=cur_stairs_up
 ```
 
 ## FTR Direct Training Objective
