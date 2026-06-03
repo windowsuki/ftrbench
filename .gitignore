@@ -70,3 +70,6 @@ datasets
 
 # Keep required FTR terrain height maps
 !source/ftrbench/ftrbench/assets/terrain/map/*.map
+
+# Local reference checkout copied from upstream; migrated assets live under source/ftrbench.
+reference/
